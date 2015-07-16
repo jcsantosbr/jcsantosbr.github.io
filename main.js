@@ -6,14 +6,41 @@
   
   var selectedRestaurant = null;
 
+  var todaysSelected = null;
+
+
+  var previousChoices = [];
+
+  var buildLiFromArray = function(a) {
+    return a.reduce(function(acc, e) { return acc + "<li>" + e + "</li>"},"");
+  }
+
+  var formatEvent = function(e) {
+    return "At " + e.day + " in " + e.choice;
+  }
+
+  var updatePage = function(){
+    $('#choose_restaurant').hide();
+    $('#retry_actions').hide();
+
+    if (!selectedRestaurant && !todaysSelected) {
+      $('#choose_restaurant').show();
+    } else if (selectedRestaurant && !todaysSelected) {
+      $('#todays_chosen_one').text(selectedRestaurant);
+      $('#chosen_message').show();
+      $('#retry_actions').show();
+    } else if (todaysSelected) {
+      $('#todays_chosen_one').text(todaysSelected);
+      $('#chosen_message').show();
+    }
+    
+    $('#previous_choices').html( buildLiFromArray(previousChoices.map(formatEvent)) );
+
+  }
+
   var selectOne = function() {
     var index = Math.floor((Math.random() * all_restaurants.length));
     return all_restaurants[index];
-  }
-
-  var displaySelected = function(selected) {
-      $('#todays_chosen_one').text(selected);
-      $('#chosen_message').show();
   }
 
   var today = function() {
@@ -22,14 +49,12 @@
 
 
   $(function() {
-    var restaurantList = all_restaurants.reduce(function(acc, e) { return acc + "<li>" + e + "</li>"},"");
-    $('#all_restaurants').html(restaurantList);
+    
+    $('#all_restaurants').html(buildLiFromArray(all_restaurants));
 
     var chooseHandler = function() {
       selectedRestaurant = selectOne();
-      displaySelected(selectedRestaurant);
-      $(this).hide();
-      
+      updatePage();
     }
 
    
@@ -37,24 +62,25 @@
     $('#try_again').on('click', chooseHandler);
     $('#confirm_choice').on('click', function() {
       datastore.push({ day: today(), choice: selectedRestaurant});
-      $(this).hide();
-      $('#try_again').hide();
+      updatePage();
     });
 
 
     datastore.on('child_added', function(snapshot) {
       var event = snapshot.val();
+
+      previousChoices.push(event);
       
       console.log('analysing ' + event.day + ' against '+ today());
       if ( event.day === today() ) {
-        console.log('already selected today');
-        displaySelected( event.choice ); 
-        $('#choose_restaurant').hide();
-        $('#confirm_choice').hide();
-        $('#try_again').hide();
+        todaysSelected = event.choice;
       }
+
+      updatePage();
       
     });
+
+    updatePage();
     
 
   });
