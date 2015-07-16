@@ -5,10 +5,7 @@
   var datastore = new Firebase('https://vivid-inferno-8778.firebaseio.com/');
   
   var selectedRestaurant = null;
-
   var todaysSelected = null;
-
-
   var previousChoices = [];
 
   var buildLiFromArray = function(a) {
@@ -43,8 +40,62 @@
     return all_restaurants[index];
   }
 
+  var formatDate = function(d) {
+    return d.toISOString().slice(0, 10);
+  }
+
   var today = function() {
-    return new Date().toISOString().slice(0, 10);
+    return formatDate(new Date());
+  }
+
+  var todayMinus = function(numberOfDays) {
+    var targetDate = new Date();
+    targetDate.setDate( targetDate.getDate() - numberOfDays);
+    return formatDate( targetDate);
+  }
+
+  var findChosen = function(day)  {
+    var chosen = previousChoices.filter( function(e) { return e.day == day} )[0];
+    return chosen ? chosen.choice : "";
+  }
+
+  var generateWeightsPerDay = function() {
+    return [1,2,3,4,5].map(function(e,i) { 
+      var dateReference = todayMinus(6 - e);
+      return { 
+        day: dateReference, 
+        weight: Math.pow(3,i), 
+        chosen: findChosen( dateReference)
+      };  
+    });
+  }
+
+  var calculateSumForRestaurant = function(restaurant) {
+    return generateWeightsPerDay().reduce( function(acc, e) { 
+        return acc + (e.chosen == restaurant ? 0 : e.weight)  
+      }, 0);
+  }
+
+  var generateRatingsForAllOptions = function() {
+    return all_restaurants.map(function(restaurant) { 
+      return { restaurant: restaurant, value: calculateSumForRestaurant(restaurant) };  
+    });
+  } 
+
+  var fillPositions = function(arr, value, qty) {
+    for(var i = 0; i < qty; i++) {
+      arr.push(value);
+    }
+    return arr;
+  }
+
+  var selectOne2 = function() {
+    var allOptions = [];
+    generateRatingsForAllOptions().forEach(function(e) {
+      fillPositions(allOptions, e.restaurant, e.value );
+    });
+    var index = Math.floor((Math.random() * allOptions.length));
+    return allOptions[index];
   }
 
 
@@ -57,7 +108,6 @@
       updatePage();
     }
 
-   
     $('#choose_restaurant').on('click', chooseHandler);
     $('#try_again').on('click', chooseHandler);
     $('#confirm_choice').on('click', function() {
@@ -71,7 +121,6 @@
 
       previousChoices.push(event);
       
-      console.log('analysing ' + event.day + ' against '+ today());
       if ( event.day === today() ) {
         todaysSelected = event.choice;
       }
@@ -81,6 +130,9 @@
     });
 
     updatePage();
+
+    window.previousChoices = previousChoices;
+    window.allOptions = all_restaurants;
     
 
   });
