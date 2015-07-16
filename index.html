@@ -12,10 +12,15 @@
   Opcoes: <ul id="all_restaurants" ></ul>
   </div>
 
-  <div id="chosen_message" style="display:none;">O sorteado foi <span id="todays_chosen_one"><span>!</div>
-  <button type="button" id="choose_restaurant" >Sortear </button>
+  <div id="chosen_message" style="display:none;">
+    <div>O sorteado foi <span id="todays_chosen_one"><span>!</div>
+    <button type="button" id="confirm_choice">Beleza!</button>
+    <button type="button" id="try_again">Tenta Outro</button>
+  </div>
+  <button type="button" id="choose_restaurant" >Sortear</button>
 
   <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
   <script src="main.js"></script> 
 </body>
 </html>
