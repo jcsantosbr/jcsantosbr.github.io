@@ -35,11 +35,6 @@
 
   }
 
-  var selectOne = function() {
-    var index = Math.floor((Math.random() * all_restaurants.length));
-    return all_restaurants[index];
-  }
-
   var formatDate = function(d) {
     return d.toISOString().slice(0, 10);
   }
@@ -64,7 +59,7 @@
       var dateReference = todayMinus(6 - e);
       return { 
         day: dateReference, 
-        weight: Math.pow(3,i), 
+        weight: Math.pow(5,i), 
         chosen: findChosen( dateReference)
       };  
     });
@@ -89,7 +84,7 @@
     return arr;
   }
 
-  var selectOne2 = function() {
+  var selectOne = function() {
     var allOptions = [];
     generateRatingsForAllOptions().forEach(function(e) {
       fillPositions(allOptions, e.restaurant, e.value );
@@ -130,10 +125,6 @@
     });
 
     updatePage();
-
-    window.previousChoices = previousChoices;
-    window.allOptions = all_restaurants;
-    
 
   });
   
