@@ -1,6 +1,6 @@
 (function() {
   'user strict';
-  var all_restaurants = ["32", "40", "Odonto", "Bingo", "Silva", "Palatus"];
+  var all_restaurants = ["32", "40", "Odonto", "Bingo", "Silva", "Palatus", "80"];
 
   var datastore = new Firebase('https://vivid-inferno-8778.firebaseio.com/');
   
